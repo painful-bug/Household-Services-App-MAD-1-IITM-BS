@@ -1,0 +1,35 @@
+{% extends "index.html" %}
+
+{% block title %}Add Review{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Review Service</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ service_request.service.name }}</h5>
+            <p class="card-text">
+                Professional: {{ service_request.professional.user.first_name }} {{ service_request.professional.user.last_name }}
+            </p>
+            
+            <form action="{{ url_for('service_requests.add_review', request_id=service_request.id) }}" method="POST">
+                <div class="mb-3">
+                    <label for="rating" class="form-label">Rating</label>
+                    <select class="form-select" id="rating" name="rating" required>
+                        <option value="5">⭐⭐⭐⭐⭐ (5 stars)</option>
+                        <option value="4">⭐⭐⭐⭐ (4 stars)</option>
+                        <option value="3">⭐⭐⭐ (3 stars)</option>
+                        <option value="2">⭐⭐ (2 stars)</option>
+                        <option value="1">⭐ (1 star)</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="comment" class="form-label">Comment</label>
+                    <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Review</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

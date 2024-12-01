@@ -1,0 +1,128 @@
+{% extends "index.html" %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">Sign Up</h3>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('auth.signup') }}" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="first_name" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="middle_name" class="form-label">Middle Name (Optional)</label>
+                            <input type="text" class="form-control" id="middle_name" name="middle_name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="last_name" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email address</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" pattern="[0-9]{10}"
+                                title="Please enter a valid 10-digit phone number" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Address</label>
+                            <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Role</label>
+                            <select class="form-select" id="role" name="role" required>
+                                <option value="customer">Customer</option>
+                                <option value="professional">Service Professional</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <div class="mb-3" id="preferred-service" style="display: none;">
+                            <label for="experience" class="form-label">Preferred Service</label>
+                            <select class="form-select" id="preferred-service" name="preferred-service" required>
+                                {% for service in services %}
+                                <option value="{{ service.name }}">{{ service.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                </div>
+                <div class="mb-3" id="experience-field" style="display: none;">
+                    <label for="experience" class="form-label">Years of Experience</label>
+                    <input type="number" class="form-control" id="experience" name="experience" min="0" step="1">
+                </div>
+
+                <div class="mb-3" id="description-field" style="display: none;">
+                    <label for="experience" class="form-label">Description</label>
+                    <input type="text" class="form-control" id="experience" name="description" min="0" step="1">
+                </div>
+                
+
+                <div class="mb-3" id="pincode-field" style="display: none;">
+                    <label for="pincode-input" class="form-label">Pincode</label>
+                    <input type="text" class="form-control" id="pincode-input" name="pincode" pattern="[0-9]{6}"
+                        maxlength="6" title="Please enter a valid 6-digit pincode">
+                </div>
+
+                <div class="mb-3" id="upload-docs" style="display: none;">
+                    <label for="upload-docs" class="form-label">Upload CV/Resume</label>
+                        <input type="file" class="form-control" id="pincode-input" name="docs">
+                        <!-- <button type="submit" class="btn btn-primary">Upload</button> -->
+                </div>
+                
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Sign Up</button>
+                </div>
+                </form>
+            </div>
+            <div class="card-footer text-center">
+                <p>Already have an account? <a href="{{ url_for('auth.login') }}">Log in</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    document.getElementById('role').addEventListener('change', function () {
+        var experienceField = document.getElementById('experience-field');
+        var pincodeField = document.getElementById('pincode-field');
+        var descriptionField = document.getElementById('description-field');
+        var preferredService = document.getElementById('preferred-service')
+        var uploadDocs = document.getElementById('upload-docs')
+        if (this.value === 'professional') {
+            experienceField.style.display = 'block';
+            pincodeField.style.display = 'block';
+            descriptionField.style.display = 'block';
+            preferredService.style.display = 'block';
+            uploadDocs.style.display = 'block';
+            document.getElementById('experience').required = true;
+            document.getElementById('pincode-input').required = true;
+            document.getElementById('preferred-service').required = true;
+            document.getElementById('upload-docs').required = true;
+        } else {
+            experienceField.style.display = 'none';
+            pincodeField.style.display = 'none';
+            descriptionField.style.display = 'none'
+            preferredService.style.display = 'none';
+            uploadDocs.style.display = 'none';
+            document.getElementById('experience').required = false;
+            document.getElementById('pincode-input').required = false;
+            document.getElementById('preferred-service').required = false;
+            document.getElementById('upload-docs').required = true;
+        }
+    });
+</script>
+{% endblock %}

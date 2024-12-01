@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Customer Dashboard{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    {% block styles %}{% endblock %}
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+        <div class="container-fluid">
+            <h2 class="navbar-brand mb-0">Welcome, {{ user.first_name }}</h2>
+            <div class="dropdown">
+                <i class="fa-solid fa-user btn btn-link" id="profileDropdown" data-bs-toggle="dropdown"
+                    aria-expanded="false"></i>
+
+
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                    <li><a class="dropdown-item" href="#">Name: {{ user.first_name }} {% if user.middle_name %}{{
+                            user.middle_name }} {% endif %}{{ user.last_name }}</a></li>
+                    <li><a class="dropdown-item" href="#">Email: {{ user.email }}</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container mt-4">
+        <h2>Available Professionals for {{ service.name }}</h2>
+
+        <div class="row">
+            {% if professionals %}
+            {% for professional in professionals %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ professional.user.first_name }} {{ professional.user.last_name }}</h5>
+                        <p class="card-text">
+                            <strong>Rating:</strong> {{ professional.rating }}/5<br>
+                            <strong>Experience:</strong> {{ professional.experience_years }} years<br>
+                            <strong>Location:</strong> {{ professional.location_pincode }} <br>
+                            <strong>Description:</strong> {{ professional.description }}
+                        </p>
+
+                        <!-- Reviews Section -->
+                        <div class="mb-3">
+                            <h6><button class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#reviewModal">Recent Reviews</button></h6>
+                        </div>
+
+                        <form action="{{ url_for('service_requests.create_service_request') }}" method="POST">
+                            <input type="hidden" name="service-id" value="{{ service.id }}">
+                            <input type="hidden" name="professional-id" value="{{ professional.id }}">
+                            <div class="mb-3">
+                                <label for="preferred-date" class="form-label">Preferred Date</label>
+                                <input type="date" class="form-control" id="preferred-date" name="preferred-date"
+                                    required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Confirm Professional</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- REVIEW MODAL Make this more stylish and tackle the text overflow -->
+
+            <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title" id="reviewModalLabel">Recent Reviews</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row row-cols-1 row-cols-md-3 g-4">
+                                {% if professional.reviews %}
+                                {% for review in professional.reviews[:3] %}
+                                <div class="col">
+                                    <div class="card h-100 shadow-sm">
+                                        <div class="card-body">
+                                            <h6 class="card-subtitle mb-2 text-muted">
+                                                Rating: {% for _ in range(review.rating) %}⭐{% endfor %}
+                                            </h6>
+                                            <p class="card-text">{{ review.comment }}</p>
+                                        </div>
+                                        <div class="card-footer bg-transparent">
+                                            <small class="text-muted">- {{ review.customer.user.first_name }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                {% else %}
+                                <div class="col-12 text-center">
+                                    <p class="text-muted">This Service Professional has not yet received a review.</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <h3 class="text-center mt-3">No Service Professional for this service is currently available. Please try again later!</h2>
+            {% endif %}
+
+        </div>
+    </div>
+
+    {% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../static/js/customer.js"></script>
+    <script src="https://kit.fontawesome.com/cd69236243.js" crossorigin="anonymous"></script>
+    {% endblock %}
+
+
+
+
+
+
+
+
+</body>
+
+</html>
