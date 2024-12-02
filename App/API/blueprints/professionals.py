@@ -30,6 +30,7 @@ def view_docs(id):
             return redirect(url_for('admin.admin_dashboard'))
 
 @professionals.route("/approve/<int:id_>", methods=["POST"])
+@login_required
 def approve_professional(id_):
   if request.method == "POST":
     req_prof = Professional.query.filter_by(user_id=id_).first()
@@ -45,6 +46,7 @@ def approve_professional(id_):
     return redirect(url_for('admin.admin_dashboard'))
 
 @professionals.route("/reject/<int:id_>", methods=["POST"])
+@login_required
 def reject_professional(id_):
     if request.method == "POST":
         professional = Professional.query.filter_by(user_id=id_).first()
@@ -145,6 +147,7 @@ def reupload_docs(user_id):
 
 
 @professionals.route("/get-rating-data/<int:id>", methods=["GET","POST"])
+@login_required
 def get_rating_data(id):
     ratings = Review.query.filter(
         Review.professional_id == id
@@ -156,6 +159,7 @@ def get_rating_data(id):
     return jsonify(ratings_values)
 
 @professionals.route("/get-accepted-rejected-data/<int:id>", methods=["GET","POST"])
+@login_required
 def get_accepted_rejected_sr_data(id):
     service_requests = ServiceRequest.query.filter(
         ServiceRequest.professional_id == id
