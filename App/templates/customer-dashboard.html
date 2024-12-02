@@ -18,6 +18,8 @@
                     placeholder="Search for services by name or pincode..." aria-label="Search">
                 <button class="btn btn-outline-success" type="submit">Search</button>
             </form>
+            <a class="dropdown-item" href="{{ url_for('customers.past_requests') }}" style="width: 60px;"><i
+                    class="fa-solid fa-clock-rotate-left"></i></a>
             <div class="dropdown">
                 <i class="fa-solid fa-user btn btn-link" id="profileDropdown" data-bs-toggle="dropdown"
                     aria-expanded="false"></i>
@@ -27,6 +29,8 @@
                     <li><a class="dropdown-item" href="#">Name: {{ user.first_name }} {% if user.middle_name %}{{
                             user.middle_name }} {% endif %}{{ user.last_name }}</a></li>
                     <li><a class="dropdown-item" href="#">Email: {{ user.email }}</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('customers.past_requests') }}">Your Past Service
+                            Requests</a></li>
                     <li>
                         <hr class="dropdown-divider">
                     </li>
@@ -39,12 +43,10 @@
     <div class="container mt-3">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-        {% for category, message in messages %}
-        <div id="alert" class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-            {{ message }}
+        <div id="alert" class="alert alert-{{ messages[0][0] }} alert-dismissible fade show" role="alert">
+            {{ messages[0][1] }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-        {% endfor %}
         {% endif %}
         {% endwith %}
     </div>
@@ -88,7 +90,7 @@
 
     <!-- Add this section after the services cards -->
     <div class="container mt-5">
-        <h3>My Service Requests</h3>
+        <h3>Your Service Requests</h3>
 
         <div class="row">
             {% if service_requests|selectattr('status', 'in', ['pending', 'accepted'])|list %}
@@ -150,9 +152,19 @@
                                 action="{{ url_for('service_requests.update_customer_request_status', request_id=request.id) }}"
                                 method="POST">
                                 <input type="hidden" name="status" value="cancelled">
+                                {% if request.prof_busy_on_same_day %}
+                                <h4>This request is invalid as the Service Professional is now busy with another
+                                    request. Please try again later!</h4>
+                                <button type="submit" class="btn btn-danger btn-sm w-100 rounded-pill"><i
+                                        class="fas fa-times me-2"></i>Close This Request</button>
+
+                                {% else %}
                                 <button type="submit" class="btn btn-danger btn-sm w-100 rounded-pill"><i
                                         class="fas fa-times me-2"></i>Cancel Request</button>
+
+                                {% endif %}
                             </form>
+
                         </div>
                     </div>
                 </div>

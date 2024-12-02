@@ -78,7 +78,7 @@ class Professional(db.Model):
     service_requests = db.relationship(
         'ServiceRequest', backref='professional')
     reviews = db.relationship('Review', backref='professional')
-   
+    users = db.relationship('User', backref='professional')
 
 class Docs(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -146,15 +146,12 @@ class ServiceRequest(db.Model):
     date_of_completion = db.Column(db.DateTime)
     # requested, assigned, rejected, completed, closed
     status = db.Column(db.String(20), default='requested')
+    prof_busy_on_same_day = db.Column(db.Boolean, default=False)
     remarks = db.Column(db.Text)
-    #! OPTIONAL attributes might delete
-    # location_pincode = db.Column(db.String(10))
-    # total_amount = db.Column(db.Float)
-
-    # Relationship with Review
     review = db.relationship(
         'Review', backref='service_request', uselist=False)
-
+    professional_ = db.relationship(
+        'Professional', backref='service_request', uselist=False)
 
 class Review(db.Model):
     __tablename__ = 'reviews'
