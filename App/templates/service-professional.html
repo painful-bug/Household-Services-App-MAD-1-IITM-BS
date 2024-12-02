@@ -90,7 +90,7 @@
             {% for request in professional.service_requests %}
             {% if request.status in ['pending', 'accepted'] %}
             <div class="col-md-4 mb-4">
-                <div class="card">
+                <div class="card" style="max-width: 300px; border: 1px solid #ccc; border-radius: 10px; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);">
                     <div class="card-body">
                         <h5 class="card-title">{{ request.service.name }}</h5>
                         <p class="card-text">
@@ -129,6 +129,85 @@
             </div>
             {% endif %}
         </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- PAST SERVICE REQUESTS -->
+
+
+
+    <h3>Past Service Requests</h3>
+    <div class="row">
+        {% if professional.service_requests|selectattr('status', 'in', ['completed'])|list %}
+        {% for request in professional.service_requests %}
+        {% if request.status in ['completed'] %}
+        <div class="col-md-4 mb-4">
+            <div class="card" style="max-width: 300px; border: 1px solid #ccc; border-radius: 10px; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);">
+                <div class="card-body">
+                    <h5 class="card-title" style="color: #333; font-weight: bold;">{{ request.service.name }}</h5>
+                    <p class="card-text" style="color: #666;">
+                        <strong>Customer:</strong> {{ request.customer.user.first_name }} {{
+                        request.customer.user.last_name }}<br>
+                        <strong>Preferred Date:</strong> {{ request.preferred_date.strftime('%Y-%m-%d') }}<br>
+                        <strong>Status:</strong> <span
+                            class="badge {% if request.status == 'accepted' %}bg-success{% else %}bg-warning{% endif %}" style="color: #fff; padding: 5px 10px; border-radius: 5px;">{{ request.status }}</span>
+                    </p>
+
+                    {% if request.status == 'pending' %}
+                    <div class="d-flex gap-2">
+                        <form
+                            action="{{ url_for('service_requests.update_request_status', request_id=request.id) }}"
+                            method="POST" class="d-inline">
+                            <input type="hidden" name="status" value="accepted">
+                            <button type="submit" class="btn btn-success" style="color: #fff; border: none; padding: 5px 10px; border-radius: 5px;">Accept</button>
+                        </form>
+                        <form
+                            action="{{ url_for('service_requests.update_request_status', request_id=request.id) }}"
+                            method="POST" class="d-inline">
+                            <input type="hidden" name="status" value="rejected">
+                            <button type="submit" class="btn btn-danger" style="color: #fff; border: none; padding: 5px 10px; border-radius: 5px;">Reject</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% else %}
+        <div class="col-12 text-center">
+            <p class="text-muted">No active service requests at the moment. 😊</p>
+        </div>
+        {% endif %}
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
 
         <!-- Reviews Section -->
         <div class="mt-5">
@@ -369,13 +448,6 @@
         
         var alert = document.getElementById("alert")
 
-        // setInterval(function () {
-        //     var opacity = alert.style.opacity;
-        //     if (opacity > 0) {
-        //         opacity -= 0.1;
-        //         alert.style.opacity = opacity;
-        //     }
-        // }, 50);
     </script>
     <script src="https://kit.fontawesome.com/cd69236243.js" crossorigin="anonymous"></script>
     {% endblock %}
