@@ -21,24 +21,24 @@
                 <!-- <span>Verification Status: {{ professional.document_verification_status }}</span> -->
                 <strong>Verification Status:</strong>
                 {% if current_user.professional_profile.document_verification_status == "pending" %}
-                    <span class="badge bg-warning">Pending Verification</span>
+                <span class="badge bg-warning">Pending Verification</span>
                 {% elif current_user.professional_profile.document_verification_status == "rejected" %}
-                    <span class="badge bg-danger">Rejected</span>
+                <span class="badge bg-danger">Rejected</span>
                 {% elif current_user.professional_profile.document_verification_status == "approved" %}
-                    <span class="badge bg-success">Approved</span>
+                <span class="badge bg-success">Approved</span>
                 {% endif %}
             </div>
 
             {% if not professional.description %}
             <div class="description-input ">
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#descriptionModal">
-                   Add Description
+                    Add Description
                 </button>
             </div>
             {% else %}
             <div class="description-input">
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#descriptionModal">
-                   Edit Description
+                    Edit Description
                 </button>
             </div>
             {% endif %}
@@ -65,6 +65,25 @@
     </nav>
 
     <div class="container mt-4">
+        <!-- Statistics Section -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Service Request Statistics</h5>
+                        <canvas width="400" height="400" id="service-stats"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Service Request Statistics</h5>
+                        <canvas width="400" height="400" id="rating-trend"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
         <h3>Service Requests</h3>
         <div class="row">
             {% if professional.service_requests|selectattr('status', 'in', ['pending', 'accepted'])|list %}
@@ -82,7 +101,7 @@
                                 class="badge {% if request.status == 'accepted' %}bg-success{% else %}bg-warning{% endif %}">{{
                                 request.status }}</span>
                         </p>
-                                                                                                                                                                                                                                                                                                                        
+
                         {% if request.status == 'pending' %}
                         <div class="d-flex gap-2">
                             <form
@@ -143,27 +162,13 @@
 
 
 
-    {% block scripts %}
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        var alert = document.getElementsById("alert")
 
-        setInterval(function () {
-            var opacity = alert.style.opacity;
-            if (opacity > 0) {
-                opacity -= 0.1;
-                alert.style.opacity = opacity;
-            }
-        }, 50);
-    </script>
-    <script src="https://kit.fontawesome.com/cd69236243.js" crossorigin="anonymous"></script>
-    {% endblock %}
 
 
     <!-- Description Modal -->
 
-    <div class="modal fade" id="descriptionModal" tabindex="-1"
-        aria-labelledby="descriptionModalLabel" aria-hidden="true">
+    <div class="modal fade" id="descriptionModal" tabindex="-1" aria-labelledby="descriptionModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -175,11 +180,10 @@
                     <div class="modal-body">
                         <div class="form-floating">
                             <textarea class="form-control"
-                            placeholder="Type in a suitable description for the service your offer..."
-                            id="description"
-                            name="desc"
-                            style="height: 400px;"></textarea>
-                            <label for="description">Type in a suitable description for the service your offer...</label>
+                                placeholder="Type in a suitable description for the service your offer..."
+                                id="description" name="desc" style="height: 400px;"></textarea>
+                            <label for="description">Type in a suitable description for the service your
+                                offer...</label>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -190,12 +194,14 @@
         </div>
     </div>
 
-<!-- Rejection Docs re-upload form -->
-    {% if current_user.professional_profile and current_user.professional_profile.document_verification_status == "rejected" %}
+    <!-- Rejection Docs re-upload form -->
+    {% if current_user.professional_profile and current_user.professional_profile.document_verification_status ==
+    "rejected" %}
     <div class="card mb-3 ">
         <div class="card-body">
             <h5 class="card-title text-danger">Document Re-upload Required</h5>
-            <p class="card-text">Your documents were rejected by the admin. Please re-upload your documents for verification.</p>
+            <p class="card-text">Your documents were rejected by the admin. Please re-upload your documents for
+                verification.</p>
 
 
             <div class="card w-25 ">
@@ -203,30 +209,25 @@
                     <h4>Reason for rejection</h4>
                 </div>
                 <div class="card-body">
-                  <!-- <h5 class="card-title">Reason for rejection</h5> -->
-                  <p class="card-text">{{ current_user.professional_profile.rejection_reason }}</p>
-                  
+                    <!-- <h5 class="card-title">Reason for rejection</h5> -->
+                    <p class="card-text">{{ current_user.professional_profile.rejection_reason }}</p>
+
                 </div>
-              </div>
+            </div>
 
 
 
 
-            <form action="{{ url_for('professionals.reupload_docs', user_id=current_user.id) }}" 
-                  method="post" 
-                  enctype="multipart/form-data">
-                
+            <form action="{{ url_for('professionals.reupload_docs', user_id=current_user.id) }}" method="post"
+                enctype="multipart/form-data">
+
                 <div class="mb-3 w-25">
                     <label for="document" class="form-label">Upload New Documents (PDF)</label>
-                    <input type="file" 
-                           class="form-control" 
-                           id="document" 
-                           name="document" 
-                           accept=".pdf"
-                           required>
-                    <div class="form-text">Please upload your identification and qualification documents in PDF format.</div>
+                    <input type="file" class="form-control" id="document" name="document" accept=".pdf" required>
+                    <div class="form-text">Please upload your identification and qualification documents in PDF format.
+                    </div>
                 </div>
-                
+
                 <button type="submit" class="btn btn-primary">
                     Re-upload Documents
                 </button>
@@ -235,6 +236,149 @@
     </div>
     {% endif %}
 
+
+
+
+    {% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize the pie chart
+        const ctx_sr = document.getElementById('service-stats').getContext('2d');
+        const ctx_ratings = document.getElementById('rating-trend').getContext('2d');
+
+        fetch(`/professionals/get-accepted-rejected-data/${ {{ current_user.professional_profile.id }} }`)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then((data) => {
+                const acceptedCount = data.accepted_count || 0; // Default to 0 if undefined
+                const rejectedCount = data.rejected_count || 0; // Default to 0 if undefined
+                console.log("COMPLETED COUNT : ", acceptedCount);
+                console.log("REJECTED COUNT : ", rejectedCount);
+                
+                // Now you can use acceptedCount and rejectedCount in your chart
+                new Chart(ctx_sr, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Completed', 'Rejected'],
+                        datasets: [{
+                            data: [acceptedCount, rejectedCount],
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(255, 159, 64, 0.2)',
+                                // 'rgba(255, 205, 86, 0.2)',
+                                // 'rgba(75, 192, 192, 0.2)',
+                                // 'rgba(54, 162, 235, 0.2)',
+                                // 'rgba(153, 102, 255, 0.2)',
+                                // 'rgba(201, 203, 207, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgb(255, 99, 132)',
+                                'rgb(255, 159, 64)',
+                                // 'rgb(255, 205, 86)',
+                                // 'rgb(75, 192, 192)',
+                                // 'rgb(54, 162, 235)',
+                                // 'rgb(153, 102, 255)',
+                                // 'rgb(201, 203, 207)'
+                            ],
+                            borderWidth: 1,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Service Requests Distribution'
+                            }
+                        }
+                    }
+                });
+            })
+            .catch((error) => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+
+
+
+
+
+            fetch(`/professionals/get-rating-data/${ {{ current_user.professional_profile.id }} }`)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then((data) => {
+                console.log(data)
+                
+           
+                const ratingFrequency = [0, 0, 0, 0, 0]; 
+                data.forEach(rating => {
+                    ratingFrequency[rating - 1]++; 
+                });
+
+                new Chart(ctx_ratings, {
+                    type: 'bar',
+                    data: {
+                        labels: [1,2,3,4,5],
+                        datasets: [{
+                            label: "Ratings Trend",
+                            data: ratingFrequency,
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(255, 159, 64, 0.2)',
+                                'rgba(255, 205, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(54, 162, 235, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgb(255, 99, 132)',
+                                'rgb(255, 159, 64)',
+                                'rgb(255, 205, 86)',
+                                'rgb(75, 192, 192)',
+                                'rgb(54, 162, 235)'
+                            ],
+                            borderWidth: 1,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Ratings Distribution'
+                            }
+                        }
+                    }
+                });
+            })
+            .catch((error) => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+
+
+        
+        var alert = document.getElementById("alert")
+
+        // setInterval(function () {
+        //     var opacity = alert.style.opacity;
+        //     if (opacity > 0) {
+        //         opacity -= 0.1;
+        //         alert.style.opacity = opacity;
+        //     }
+        // }, 50);
+    </script>
+    <script src="https://kit.fontawesome.com/cd69236243.js" crossorigin="anonymous"></script>
+    {% endblock %}
 </body>
 
 </html>

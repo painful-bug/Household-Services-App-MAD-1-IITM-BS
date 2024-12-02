@@ -186,11 +186,23 @@ def professional_dashboard():
     if current_user.role != "professional":
         flash("Access denied. Professional account required.", "danger")
         return redirect(url_for('auth.login'))
+    
     current_professional_user = Professional.query.filter_by(
         user_id=current_user.id
     ).first()
-    print("Current professional info", current_professional_user.user_id)
-    return render_template("service-professional.html", user=current_user, professional=current_professional_user)
+    
+    service_requests = ServiceRequest.query.filter(
+        ServiceRequest.professional_id == current_professional_user.id
+    ).all()
+
+    accepted_count = rejected_count = 0
+    for req in service_requests:
+        if req.status == "accepted":
+            accepted_count = accepted_count + 1
+        if req.status == "rejected":
+            rejected_count = rejected_count + 1
+    
+    return render_template("service-professional.html", user=current_user, professional=current_professional_user,)
 
 
 @auth.route("/customer-dashboard")
@@ -225,3 +237,4 @@ def delete_user(id):
     except Exception as e:
         db.session.rollback()
         return {"error": "Failed to delete user"}, 500
+

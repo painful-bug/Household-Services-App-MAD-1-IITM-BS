@@ -1,6 +1,6 @@
 from flask import Blueprint, flash, redirect, request, url_for, render_template, jsonify
 from flask_login import login_required
-from App.models.db_models import User, Professional, Docs, db
+from App.models.db_models import ServiceRequest, User, Professional, Docs, Review, db
 
 professionals = Blueprint('professionals', __name__,
                           url_prefix="/professionals")
@@ -142,3 +142,35 @@ def reupload_docs(user_id):
             
         flash("Error uploading documents", "error")
         return redirect(url_for('auth.professional_dashboard'))
+
+
+@professionals.route("/get-rating-data/<int:id>", methods=["GET","POST"])
+def get_rating_data(id):
+    ratings = Review.query.filter(
+        Review.professional_id == id
+    ).all()
+    ratings_values = []
+    for i in ratings:
+        ratings_values.append(i.rating)
+    print(ratings_values)
+    return jsonify(ratings_values)
+
+@professionals.route("/get-accepted-rejected-data/<int:id>", methods=["GET","POST"])
+def get_accepted_rejected_sr_data(id):
+    service_requests = ServiceRequest.query.filter(
+        ServiceRequest.professional_id == id
+    ).all()
+
+    accepted_count = rejected_count = 0
+    for req in service_requests:
+        print("REQ ID : ",req.id)
+        if req.status == "completed":
+            accepted_count = accepted_count + 1
+        if req.status == "rejected":
+            rejected_count = rejected_count + 1
+    print("COMPLETED COUNT : ", accepted_count)
+    print("REJECTED COUNT : ", rejected_count)
+    return jsonify({
+        "accepted_count" : accepted_count,
+        "rejected_count": rejected_count
+    })
