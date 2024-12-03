@@ -178,3 +178,19 @@ def get_accepted_rejected_sr_data(id):
         "accepted_count" : accepted_count,
         "rejected_count": rejected_count
     })
+
+@professionals.route("/get-reviews/<int:id>", methods=["GET"])
+@login_required
+def get_reviews(id):
+    reviews = Review.query.filter_by(professional_id=id).all()
+    reviews_data = []
+    
+    for review in reviews:
+        reviews_data.append({
+            'customer_name': f"{review.customer.user.first_name} {review.customer.user.last_name}",
+            'rating': review.rating,
+            'comment': review.comment,
+            'created_at': review.created_at.strftime('%Y-%m-%d')
+        })
+    
+    return jsonify(reviews_data)

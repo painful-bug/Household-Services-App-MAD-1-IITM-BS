@@ -50,7 +50,7 @@
                         <!-- Reviews Section -->
                         <div class="mb-3">
                             <h6><button class="btn btn-primary" data-bs-toggle="modal"
-                                    data-bs-target="#reviewModal">Recent Reviews</button></h6>
+                                   data-id="{{ professional.id }}" data-bs-target="#reviewModal{{ professional.id }}">Recent Reviews</button></h6>
                         </div>
 
                         <form action="{{ url_for('service_requests.create_service_request') }}" method="POST">
@@ -70,36 +70,16 @@
 
             <!-- REVIEW MODAL Make this more stylish and tackle the text overflow -->
 
-            <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+            <div class="modal fade" id="reviewModal{{ professional.id }}" tabindex="-1" aria-labelledby="reviewModalLabel{{ professional.id }}" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-lg">
                     <div class="modal-content">
                         <div class="modal-header bg-primary text-white">
-                            <h5 class="modal-title" id="reviewModalLabel">Recent Reviews</h5>
+                            <h5 class="modal-title" id="reviewModalLabel{{ professional.id }}">Reviews for {{ professional.user.first_name }} {{ professional.user.last_name }}</h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <div class="row row-cols-1 row-cols-md-3 g-4">
-                                {% if professional.reviews %}
-                                {% for review in professional.reviews[:3] %}
-                                <div class="col">
-                                    <div class="card h-100 shadow-sm">
-                                        <div class="card-body">
-                                            <h6 class="card-subtitle mb-2 text-muted">
-                                                Rating: {% for _ in range(review.rating) %}⭐{% endfor %}
-                                            </h6>
-                                            <p class="card-text">{{ review.comment }}</p>
-                                        </div>
-                                        <div class="card-footer bg-transparent">
-                                            <small class="text-muted">- {{ review.customer.user.first_name }}</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                                {% else %}
-                                <div class="col-12 text-center">
-                                    <p class="text-muted">This Service Professional has not yet received a review.</p>
-                                </div>
-                                {% endif %}
+                            <div id="reviewModalRow{{ professional.id }}" class="row row-cols-1 row-cols-md-3 g-4">
+                                <!-- Reviews will be loaded dynamically -->
                             </div>
                         </div>
                     </div>
@@ -118,6 +98,61 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../static/js/customer.js"></script>
     <script src="https://kit.fontawesome.com/cd69236243.js" crossorigin="anonymous"></script>
+    <script>
+        // Add event listeners for all review modals
+        document.addEventListener('DOMContentLoaded', function() {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                modal.addEventListener('show.bs.modal', function(event) {
+                    const professionalId = this.id.replace('reviewModal', '');
+                    fetchReviews(professionalId);
+                });
+            });
+        });
+
+        async function fetchReviews(professionalId) {
+            try {
+                const response = await fetch(`/professionals/get-reviews/${professionalId}`);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const reviews = await response.json();
+                displayReviews(reviews, professionalId);
+            } catch (error) {
+                console.error('Error fetching reviews:', error);
+            }
+        }
+
+        function displayReviews(reviews, professionalId) {
+            const reviewContainer = document.getElementById(`reviewModalRow${professionalId}`);
+            
+            if (reviews.length === 0) {
+                reviewContainer.innerHTML = `
+                    <div class="col-12 text-center">
+                        <p class="text-muted">This Service Professional has not yet received a review.</p>
+                    </div>`;
+                return;
+            }
+
+            reviewContainer.innerHTML = reviews.map(review => `
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-muted">
+                                Rating: ${'⭐'.repeat(review.rating)}
+                            </h6>
+                            <p class="card-text">${review.comment}</p>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <small class="text-muted">- ${review.customer_name}</small>
+                            <br>
+                            <small class="text-muted">${review.created_at}</small>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+    </script>
     {% endblock %}
 
 

@@ -11,8 +11,7 @@ def past_requests():
   print("CURRENT USER CUSTOMER ID : ", current_user.customer_profile.id)
   past_requests = ServiceRequest.query.filter(
     ServiceRequest.customer_id == current_user.customer_profile.id,
-    # ServiceRequest.status == "completed",
-    # ServiceRequest.status == "rejected"
+    ServiceRequest.status != None
   ).all()
   print(f"PAST REQUESTS OF {current_user.first_name} : ", past_requests)
   return render_template("past-requests.html", past_requests=past_requests,user=current_user)
